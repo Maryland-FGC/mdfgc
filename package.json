@@ -1,0 +1,27 @@
+{
+  "name": "mdfgc",
+  "version": "1.0.0",
+  "description": "Official Maryland FGC Hub",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maryland-FGC/mdfgc.git"
+  },
+  "keywords": [
+    "Maryland",
+    "FGC"
+  ],
+  "author": "Eric Harris",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Maryland-FGC/mdfgc/issues"
+  },
+  "homepage": "https://github.com/Maryland-FGC/mdfgc#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "googleapis": "^122.0.0"
+  }
+}
