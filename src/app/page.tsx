@@ -1,6 +1,52 @@
+"use client"
+
 import Image from 'next/image'
+import {useEffect, useState} from "react";
+
+type Event = {
+  kind: string,
+  etag: string,
+  id: string,
+  status: string,
+  htmlLink: string,
+  created: string,
+  updated: string,
+  summary: string,
+  description: string,
+  creator: { email: string },
+  organizer: {
+    email: string,
+    self: boolean,
+  },
+  start: {
+    dateTime: string,
+    timeZone: string,
+  },
+  end: {
+    dateTime: string,
+    timeZone: string,
+  },
+  iCalUID: string,
+  sequence: number,
+  reminders: {
+    useDefault: boolean,
+    overrides: any[],
+  },
+  eventType: string,
+}
 
 export default function Home() {
+  const [events, setEvents] = useState([] as Event[]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/events", {
+      method: "GET",
+    }).then((res) => res.json())
+      .then((data: Event[]) => {
+        // setEvents(data);
+      });
+  })
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
