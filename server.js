@@ -35,86 +35,8 @@ const calendar = google.calendar({
   auth: jwtClient,
 });
 
-const auth = new google.auth.GoogleAuth({
-  keyFile: "./keys.json",
-  scopes: SCOPES,
-});
-
-const calendarEvent = {
-  summary: "Test Event added by Node.js",
-  description: "This event was created by Node.js",
-  start: {
-    dateTime: "2023-08-03T09:00:00-02:00",
-    timeZone: "Asia/Kolkata",
-  },
-  end: {
-    dateTime: "2023-08-04T17:00:00-02:00",
-    timeZone: "Asia/Kolkata",
-  },
-  attendees: [],
-  reminders: {
-    useDefault: false,
-    overrides: [
-      { method: "email", minutes: 24 * 60 },
-      { method: "popup", minutes: 10 },
-    ],
-  },
-};
-
 const addCalendarEvent = async () => {
-  auth.getClient().then((auth) => {
-    calendar.events.insert(
-        {
-          auth: auth,
-          calendarId: GOOGLE_CALENDAR_ID,
-          resource: calendarEvent,
-        },
-        function (error, response) {
-          if (error) {
-            console.log("Something went wrong: " + error); // If there is an error, log it to the console
-            return;
-          }
-          console.log("Event created successfully.")
-          console.log("Event details: ", response.data); // Log the event details
-        }
-    );
-  });
-};
-
-const listCalendarEvents = () => {
-  calendar.events.list(
-      {
-        calendarId: GOOGLE_CALENDAR_ID,
-        timeMin: new Date().toISOString(),
-        maxResults: 10,
-        singleEvents: true,
-        orderBy: "startTime",
-      },
-      (error, result) => {
-        if (error) {
-          console.log("Something went wrong: ", error); // If there is an error, log it to the console
-        } else {
-          if (result.data.items.length > 0) {
-            console.log("List of upcoming events: ", result.data.items); // If there are events, print them out
-          } else {
-            console.log("No upcoming events found."); // If no events are found
-          }
-        }
-      }
-  );
-};
-
-
-if (!env) {
-  console.log("Environment not detected, please run again with either 'dev', 'sat', or 'prod'.");
-  process.exit();
-}
-
-const app = express();
-app.get('/events', cors(), async (request, response) => {
-  const body = listCalendarEvents();
-
-  const res = await calendar.events.insert({
+  return await calendar.events.insert({
     // Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     calendarId: GOOGLE_CALENDAR_ID,
 
@@ -182,9 +104,41 @@ app.get('/events', cors(), async (request, response) => {
       // }
     },
   });
+};
 
-  response.send({...res.data});
-  // addCalendarEvent();
+const listCalendarEvents = async () => {
+  return await calendar.events.list({
+    calendarId: GOOGLE_CALENDAR_ID,
+    timeMin: new Date().toISOString(),
+    maxResults: 10,
+    singleEvents: true,
+    orderBy: "startTime",
+  });
+};
+
+
+if (!env) {
+  console.log("Environment not detected, please run again with either 'dev', 'sat', or 'prod'.");
+  process.exit();
+}
+
+const app = express();
+app.get('/events/list', cors(), async (request, response) => {
+  const events = await listCalendarEvents();
+
+  if (events.data.items.length > 0) {
+    console.log("List of upcoming events: ", events.data.items); // If there are events, print them out
+  } else {
+    console.log("No upcoming events found."); // If no events are found
+  }
+
+  response.send(events.data);
+});
+
+app.get('/events/create', cors(), async (request, response) => {
+  const events = await addCalendarEvent();
+  console.log(events);
+  response.send(`Event saved!`);
 });
 
 app.disable('x-powered-by');
