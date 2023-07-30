@@ -132,7 +132,7 @@ app.get('/events/list', cors(), async (request, response) => {
     console.log("No upcoming events found."); // If no events are found
   }
 
-  response.send(events.data);
+  response.send(events.data.items);
 });
 
 app.get('/events/create', cors(), async (request, response) => {
